@@ -1,0 +1,284 @@
+cabal-version: 3.0
+
+name:                   bcc-cli
+version:                1.99.0
+description:            The Bcc command-line interface.
+author:                 TBCO
+maintainer:             operations@blockchain-company.io
+license:                Apache-2.0
+license-files:          LICENSE
+                        NOTICE
+build-type:             Simple
+extra-source-files:     README.md
+
+Flag unexpected_thunks
+  Description:   Turn on unexpected thunks checks
+  Default:       False
+
+common base
+  build-depends: base >= 4.14 && < 4.15
+
+common project-config
+  default-language:     Haskell2010
+
+  default-extensions:   NoImplicitPrelude
+                        OverloadedStrings
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wpartial-fields
+                        -Wredundant-constraints
+                        -Wunused-packages
+
+common maybe-unix
+  if !os(windows)
+     build-depends:    unix
+
+common maybe-Win32
+  if os(windows)
+     build-depends:    Win32
+
+library
+  import:               base, project-config
+                      , maybe-unix
+                      , maybe-Win32
+
+  if flag(unexpected_thunks)
+    cpp-options: -DUNEXPECTED_THUNKS
+
+  hs-source-dirs:       src
+
+  exposed-modules:      Bcc.CLI.Helpers
+                        Bcc.CLI.Parsers
+                        Bcc.CLI.Render
+                        Bcc.CLI.Run
+                        Bcc.CLI.Run.Friendly
+                        Bcc.CLI.Types
+
+                        Bcc.CLI.Environment
+
+                        Bcc.CLI.Cole.Commands
+                        Bcc.CLI.Cole.Parsers
+                        Bcc.CLI.Cole.Run
+                        Bcc.CLI.Cole.Delegation
+                        Bcc.CLI.Cole.Genesis
+                        Bcc.CLI.Cole.Key
+                        Bcc.CLI.Cole.Legacy
+                        Bcc.CLI.Cole.Tx
+                        Bcc.CLI.Cole.Query
+                        Bcc.CLI.Cole.UpdateProposal
+                        Bcc.CLI.Cole.Vote
+
+                        Bcc.CLI.Sophie.Commands
+                        Bcc.CLI.Sophie.Key
+                        Bcc.CLI.Sophie.Orphans
+                        Bcc.CLI.Sophie.Output
+                        Bcc.CLI.Sophie.Parsers
+                        Bcc.CLI.Sophie.Run
+                        Bcc.CLI.Sophie.Run.Address
+                        Bcc.CLI.Sophie.Run.Address.Info
+                        Bcc.CLI.Sophie.Run.Genesis
+                        Bcc.CLI.Sophie.Run.Governance
+                        Bcc.CLI.Sophie.Run.Key
+                        Bcc.CLI.Sophie.Run.Node
+                        Bcc.CLI.Sophie.Run.Pool
+                        Bcc.CLI.Sophie.Run.Query
+                        Bcc.CLI.Sophie.Run.StakeAddress
+                        Bcc.CLI.Sophie.Run.TextView
+                        Bcc.CLI.Sophie.Run.Transaction
+                        Bcc.CLI.Sophie.Script
+
+                        Bcc.CLI.Jen.ValueParser
+
+                        Bcc.CLI.TopHandler
+
+  other-modules:        Paths_bcc_cli
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , aeson-pretty      >= 0.8.5
+                      , ansi-terminal
+                      , attoparsec
+                      , bech32            >= 1.1.0
+                      , binary
+                      , bytestring
+                      , base16-bytestring >= 1.0
+                      , bcc-api
+                      , bcc-binary
+                      , bcc-config
+                      , bcc-crypto
+                      , bcc-crypto-class
+                      , bcc-crypto-wrapper
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole
+                      , bcc-ledger-core
+                      , bcc-ledger-sophie-ma
+                      , bcc-prelude
+                      , bcc-protocol-toptimum
+                      , bcc-slotting
+                      , contra-tracer
+                      , cborg >= 0.2.4 && < 0.3
+                      , containers
+                      , cryptonite
+                      , directory
+                      , filepath
+                      , formatting
+                      , iproute
+                      , network
+                      , optparse-applicative-fork
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-cole
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-consensus-sophie
+                      , shardagnostic-network
+                      , parsec
+                      , zerepoch-ledger-api
+                      , prettyprinter
+                      , sophie-spec-ledger
+                      , small-steps
+                      , split
+                      , strict-containers
+                      , text
+                      , time
+                      , transformers
+                      , transformers-except
+                      , utf8-string
+                      , unordered-containers
+                      , vector
+                      , yaml
+
+executable bcc-cli
+  import:               base, project-config
+                      , maybe-unix
+  hs-source-dirs:       app
+  main-is:              bcc-cli.hs
+  ghc-options:          -threaded -rtsopts "-with-rtsopts=-T"
+
+  build-depends:        bcc-cli
+                      , bcc-crypto-class
+                      , bcc-prelude
+                      , optparse-applicative-fork
+                      , transformers-except
+
+test-suite bcc-cli-test
+  import:               base, project-config
+
+  hs-source-dirs:       test
+  main-is:              bcc-cli-test.hs
+  type:                 exitcode-stdio-1.0
+
+  build-depends:        bech32            >= 1.1.0
+                      , bytestring
+                      , base16-bytestring
+                      , bcc-api
+                      , bcc-api:gen
+                      , bcc-cli
+                      , bcc-node
+                      , bcc-prelude
+                      , bcc-slotting
+                      , exceptions
+                      , hedgehog
+                      , hedgehog-extras
+                      , parsec
+                      , text
+
+  other-modules:        Test.Cli.FilePermissions
+                        Test.Cli.ITN
+                        Test.Cli.MultiAssetParsing
+                        Test.Cli.Pioneers.Exercise1
+                        Test.Cli.Pioneers.Exercise2
+                        Test.Cli.Pioneers.Exercise3
+                        Test.Cli.Pioneers.Exercise4
+                        Test.Cli.Pioneers.Exercise5
+                        Test.Cli.Pioneers.Exercise6
+                        Test.Cli.Sophie.Run.Query
+                        Test.OptParse
+
+  ghc-options:          -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
+
+test-suite bcc-cli-golden
+  import:               base, project-config
+
+  hs-source-dirs:       test
+  main-is:              bcc-cli-golden.hs
+  type:                 exitcode-stdio-1.0
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , bytestring
+                      , bcc-api
+                      , bcc-cli
+                      , bcc-crypto-wrapper
+                      , bcc-ledger-cole
+                      , bcc-prelude
+                      , cborg
+                      , containers
+                      , Diff
+                      , directory
+                      , exceptions
+                      , filepath
+                      , hedgehog
+                      , hedgehog-extras
+                      , text
+                      , time
+                      , unordered-containers
+  build-tool-depends:   bcc-cli:bcc-cli
+
+  other-modules:        Test.Golden.Cole.SigningKeys
+                        Test.Golden.Cole.Tx
+                        Test.Golden.Cole.TxBody
+                        Test.Golden.Cole.UpdateProposal
+                        Test.Golden.Cole.Vote
+                        Test.Golden.Cole.Witness
+                        Test.Golden.Sophie
+                        Test.Golden.Sophie.Address.Build
+                        Test.Golden.Sophie.Address.Info
+                        Test.Golden.Sophie.Address.KeyGen
+                        Test.Golden.Sophie.Genesis.Create
+                        Test.Golden.Sophie.Genesis.InitialTxIn
+                        Test.Golden.Sophie.Genesis.KeyGenDelegate
+                        Test.Golden.Sophie.Genesis.KeyGenGenesis
+                        Test.Golden.Sophie.Genesis.KeyGenUtxo
+                        Test.Golden.Sophie.Genesis.KeyHash
+                        Test.Golden.Sophie.Key.ConvertBccAddressKey
+                        Test.Golden.Sophie.Metadata.StakePoolMetadata
+                        Test.Golden.Sophie.MultiSig.Address
+                        Test.Golden.Sophie.Node.IssueOpCert
+                        Test.Golden.Sophie.Node.KeyGen
+                        Test.Golden.Sophie.Node.KeyGenKes
+                        Test.Golden.Sophie.Node.KeyGenVrf
+                        Test.Golden.Sophie.StakeAddress.Build
+                        Test.Golden.Sophie.StakeAddress.DeregistrationCertificate
+                        Test.Golden.Sophie.StakeAddress.KeyGen
+                        Test.Golden.Sophie.StakeAddress.RegistrationCertificate
+                        Test.Golden.Sophie.StakePool.RegistrationCertificate
+                        Test.Golden.Sophie.TextEnvelope.Certificates.GenesisKeyDelegationCertificate
+                        Test.Golden.Sophie.TextEnvelope.Certificates.MIRCertificate
+                        Test.Golden.Sophie.TextEnvelope.Certificates.OperationalCertificate
+                        Test.Golden.Sophie.TextEnvelope.Certificates.StakeAddressCertificates
+                        Test.Golden.Sophie.TextEnvelope.Certificates.StakePoolCertificates
+                        Test.Golden.Sophie.TextEnvelope.Keys.ExtendedPaymentKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.GenesisDelegateKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.VestedDelegateKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.GenesisKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.VestedKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.GenesisUTxOKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.KESKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.PaymentKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.StakeKeys
+                        Test.Golden.Sophie.TextEnvelope.Keys.VRFKeys
+                        Test.Golden.Sophie.TextEnvelope.Tx.Tx
+                        Test.Golden.Sophie.TextEnvelope.Tx.TxBody
+                        Test.Golden.Sophie.TextEnvelope.Tx.Witness
+                        Test.Golden.Sophie.TextView.DecodeCbor
+                        Test.Golden.Sophie.Transaction.Assemble
+                        Test.Golden.Sophie.Transaction.Build
+                        Test.Golden.Sophie.Transaction.CalculateMinFee
+                        Test.Golden.Sophie.Transaction.CreateWitness
+                        Test.Golden.Sophie.Transaction.Sign
+                        Test.Golden.TxView
+                        Test.Golden.Version
+                        Test.OptParse
+                        Test.Utilities
+
+  ghc-options:          -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T

@@ -1,0 +1,123 @@
+cabal-version: 3.0
+
+name:                   bcc-submit-api
+version:                3.1.2
+synopsis:               A web server that allows transactions to be POSTed to the bcc chain
+description:
+homepage:               https://github.com/The-Blockchain-Company/bcc-node
+bug-reports:            https://github.com/The-Blockchain-Company/bcc-node/issues
+license:                Apache-2.0
+license-file:           LICENSE
+author:                 TBCO Engineering Team
+maintainer:             operations@blockchain-company.io
+copyright:              (c)2021 TBCO
+category:               Language
+build-type:             Simple
+extra-source-files:     CHANGELOG.md
+
+common base                         { build-depends: base                             >= 4.14       && < 4.15   }
+
+common bcc-api                     { build-depends: bcc-api                         >= 0.1.0.0                  }
+common bcc-submit-api              { build-depends: bcc-submit-api                  >= 0.1.0.0                  }
+
+common aeson                        { build-depends: aeson                            >= 1.5.5.1                  }
+common async                        { build-depends: async                            >= 2.2.2                    }
+common bytestring                   { build-depends: bytestring                       >= 0.10.8.2                 }
+common bcc-binary                  { build-depends: bcc-binary                      >= 1.5.0                    }
+common bcc-crypto-class            { build-depends: bcc-crypto-class                >= 0.1.0.0                  }
+common bcc-ledger-cole          { build-depends: bcc-ledger-cole              >= 0.1.0.0                  }
+common formatting                   { build-depends: formatting                       >= 6.3.7                    }
+common http-media                   { build-depends: http-media                       >= 0.8.0.0                  }
+common tbco-monitoring          { build-depends: tbco-monitoring              >= 0.1.10.1                 }
+common mtl                          { build-depends: mtl                              >= 2.2.2                    }
+common network                      { build-depends: network                          >= 3.1.2.1                  }
+common optparse-applicative-fork    { build-depends: optparse-applicative-fork        >= 0.16.1.0                 }
+common shardagnostic-consensus-bcc           { build-depends: shardagnostic-consensus-bcc               >= 0.1.0.0                  }
+common shardagnostic-network            { build-depends: shardagnostic-network                            >= 0.1.0.0                  }
+common prometheus                   { build-depends: prometheus                       >= 2.2.2                    }
+common protolude                    { build-depends: protolude                        >= 0.3.0                    }
+common servant                      { build-depends: servant                          >= 0.18.2                   }
+common servant-server               { build-depends: servant-server                   >= 0.18.2                   }
+common streaming-commons            { build-depends: streaming-commons                >= 0.2.2.1                  }
+common text                         { build-depends: text                             >= 1.2.3.2                  }
+common transformers-except          { build-depends: transformers-except              >= 0.1.1                    }
+common warp                         { build-depends: warp                             >= 3.3.13                   }
+common yaml                         { build-depends: yaml                             >= 0.11.5.0                 }
+
+common project-config
+  default-language:     Haskell2010
+  
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Werror
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wno-all-missed-specialisations
+                        -Wno-implicit-prelude
+                        -Wno-missing-import-lists
+                        -Wno-safe
+                        -Wno-unsafe
+                        -Wunused-packages
+
+                        -XNoImplicitPrelude
+
+                        -fwarn-incomplete-patterns
+                        -fwarn-redundant-constraints
+
+library
+  import:               base, project-config
+                      , aeson
+                      , async
+                      , bytestring
+                      , bcc-api
+                      , bcc-binary
+                      , bcc-crypto-class
+                      , bcc-ledger-cole
+                      , formatting
+                      , http-media
+                      , tbco-monitoring
+                      , mtl
+                      , network
+                      , optparse-applicative-fork
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-network
+                      , prometheus
+                      , protolude
+                      , servant
+                      , servant-server
+                      , streaming-commons
+                      , text
+                      , transformers-except
+                      , warp
+                      , yaml
+
+  hs-source-dirs:       src
+
+  exposed-modules:      Bcc.TxSubmit
+
+  other-modules:        Bcc.TxSubmit.CLI.Parsers
+                      , Bcc.TxSubmit.CLI.Types
+                      , Bcc.TxSubmit.Config
+                      , Bcc.TxSubmit.ErrorRender
+                      , Bcc.TxSubmit.Metrics
+                      , Bcc.TxSubmit.Rest.Parsers
+                      , Bcc.TxSubmit.Rest.Types
+                      , Bcc.TxSubmit.Rest.Web
+                      , Bcc.TxSubmit.Tracing.ToObjectOrphans
+                      , Bcc.TxSubmit.Types
+                      , Bcc.TxSubmit.Util
+                      , Bcc.TxSubmit.Web
+
+executable bcc-submit-api
+  import:               base, project-config
+                      , bcc-submit-api
+                      , optparse-applicative-fork
+  main-is:              Main.hs
+  hs-source-dirs:       app
+  ghc-options:          -threaded -rtsopts "-with-rtsopts=-T -I0"
+
+test-suite unit
+  import:               base, project-config
+  type:                 exitcode-stdio-1.0
+  main-is:              test.hs
+  hs-source-dirs:       test

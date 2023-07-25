@@ -1,0 +1,9 @@
+PROJECT_NAME	Makefile	/^PROJECT_NAME = bcc-node$/;"	m
+NUM_PROC	Makefile	/^NUM_PROC     = $(nproc --all)$/;"	m
+CLUSTER_PROFILE	Makefile	/^CLUSTER_PROFILE    ?= default-alzo$/;"	m
+CLUSTER_ARGS_EXTRA	Makefile	/^CLUSTER_ARGS_EXTRA ?=$/;"	m
+BENCH_REPEATS	Makefile	/^BENCH_REPEATS ?= 3$/;"	m
+BENCH_CONFIG	Makefile	/^BENCH_CONFIG ?= both$/;"	m
+BENCH_TAG	Makefile	/^BENCH_TAG ?= HEAD$/;"	m
+BENCH_XARGS	Makefile	/^BENCH_XARGS ?=$/;"	m
+BENCH_XARGS	Makefile	/^profile-chainsync-fast: BENCH_XARGS=--skip-prefetch$/;"	m

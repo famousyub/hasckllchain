@@ -1,0 +1,9 @@
+{
+   "Producers": [
+     {
+       "addr": "relays-new.awstest.tbcodev.io",
+       "port": 3001,
+       "valency": 1
+     }
+   ]
+ }

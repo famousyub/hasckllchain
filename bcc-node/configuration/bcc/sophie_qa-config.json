@@ -1,0 +1,87 @@
+{
+  "ApplicationName": "bcc-sl",
+  "ApplicationVersion": 0,
+  "ColeGenesisFile": "sophie_qa-cole-genesis.json",
+  "ColeGenesisHash": "9325495d3ac7554d4bfaf2392cc3c74676d5add873d6ef8862d7562e660940bf",
+  "LastKnownBlockVersion-Major": 2,
+  "LastKnownBlockVersion-Sentry": 0,
+  "MaxKnownMajorProtocolVersion": 2,
+  "PBftSignatureThreshold": 0.9,
+  "Protocol": "Bcc",
+  "RequiresNetworkMagic": "RequiresMagic",
+  "SophieGenesisFile": "sophie_qa-sophie-genesis.json",
+  "SophieGenesisHash": "85d1783750753deaa6560158eb85fcb30078ea32a36e12dd8af39168bc053d09",
+  "TestSophieHardForkAtEpoch": 2,
+  "TraceBlockFetchClient": false,
+  "TraceBlockFetchDecisions": false,
+  "TraceBlockFetchProtocol": false,
+  "TraceBlockFetchProtocolSerialised": false,
+  "TraceBlockFetchServer": false,
+  "TraceChainDb": true,
+  "TraceChainSyncBlockServer": false,
+  "TraceChainSyncClient": false,
+  "TraceChainSyncHeaderServer": false,
+  "TraceChainSyncProtocol": false,
+  "TraceDNSResolver": true,
+  "TraceDNSSubscription": true,
+  "TraceErrorPolicy": true,
+  "TraceForge": true,
+  "TraceHandshake": false,
+  "TraceIpSubscription": true,
+  "TraceLocalChainSyncProtocol": false,
+  "TraceLocalErrorPolicy": true,
+  "TraceLocalHandshake": false,
+  "TraceLocalTxSubmissionProtocol": false,
+  "TraceLocalTxSubmissionServer": false,
+  "TraceMempool": true,
+  "TraceMux": false,
+  "TraceTxInbound": false,
+  "TraceTxOutbound": false,
+  "TraceTxSubmissionProtocol": false,
+  "TracingVerbosity": "NormalVerbosity",
+  "TurnOnLogMetrics": true,
+  "TurnOnLogging": true,
+  "defaultBackends": [
+    "KatipBK"
+  ],
+  "defaultScribes": [
+    [
+      "StdoutSK",
+      "stdout"
+    ]
+  ],
+  "hasEKG": 12788,
+  "hasPrometheus": [
+    "127.0.0.1",
+    12798
+  ],
+  "minSeverity": "Debug",
+  "options": {
+    "mapBackends": {
+      "bcc.node.metrics": [
+        "EKGViewBK"
+      ]
+    },
+    "mapSubtrace": {
+      "bcc.node.metrics": {
+        "subtrace": "Neutral"
+      }
+    }
+  },
+  "rotation": {
+    "rpKeepFilesNum": 10,
+    "rpLogLimitBytes": 5000000,
+    "rpMaxAgeHours": 24
+  },
+  "setupBackends": [
+    "KatipBK"
+  ],
+  "setupScribes": [
+    {
+      "scFormat": "ScText",
+      "scKind": "StdoutSK",
+      "scName": "stdout",
+      "scRotation": null
+    }
+  ]
+}

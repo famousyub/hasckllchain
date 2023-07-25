@@ -1,0 +1,230 @@
+cabal-version: 3.0
+
+name:                   bcc-api
+version:                1.99.0
+description:            The bcc api
+author:                 TBCO
+maintainer:             operations@blockchain-company.io
+license:                Apache-2.0
+license-files:          LICENSE
+                        NOTICE
+build-type:             Simple
+extra-source-files:     README.md, ChangeLog.md
+
+common base                         { build-depends: base                             >= 4.14       && < 4.15   }
+
+common project-config
+  default-language:     Haskell2010
+  default-extensions:   NoImplicitPrelude
+                        OverloadedStrings
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wpartial-fields
+                        -Wredundant-constraints
+                        -Wunused-packages
+
+library
+  import:               base, project-config
+
+  hs-source-dirs:       src
+
+  exposed-modules:      Bcc.Api
+                        Bcc.Api.Cole
+                        Bcc.Api.Crypto.Ed25519Bip32
+                        Bcc.Api.Sophie
+                        Bcc.Api.ChainSync.Client
+                        Bcc.Api.ChainSync.ClientPipelined
+
+                        -- TODO: Eliminate in the future when
+                        -- we create wrapper types for the ledger types
+                        -- in this modulde
+                        Bcc.Api.Orphans
+                        --TODO: Remove all Bcc.Api.Protocol.x
+                        -- when new IPC is integrated with bcc-node-chairman
+                        Bcc.Api.Protocol.Cole
+                        Bcc.Api.Protocol.Bcc
+                        Bcc.Api.Protocol.Sophie
+                        Bcc.Api.Protocol.Types
+
+  other-modules:
+                        -- Splitting up the big Typed module:
+                        Bcc.Api.Address
+                        Bcc.Api.Block
+                        Bcc.Api.Certificate
+                        Bcc.Api.Eras
+                        Bcc.Api.Error
+                        Bcc.Api.Fees
+                        Bcc.Api.GenesisParameters
+                        Bcc.Api.Hash
+                        Bcc.Api.HasTypeProxy
+                        Bcc.Api.IPC
+                        Bcc.Api.IPC.Monad
+                        Bcc.Api.Json
+                        Bcc.Api.Key
+                        Bcc.Api.KeysCole
+                        Bcc.Api.KeysOptimum
+                        Bcc.Api.KeysSophie
+                        Bcc.Api.LedgerEvent
+                        Bcc.Api.LedgerState
+                        Bcc.Api.Modes
+                        Bcc.Api.NetworkId
+                        Bcc.Api.OperationalCertificate
+                        Bcc.Api.ProtocolParameters
+                        Bcc.Api.Query
+                        Bcc.Api.Script
+                        Bcc.Api.ScriptData
+                        Bcc.Api.SerialiseBech32
+                        Bcc.Api.SerialiseCBOR
+                        Bcc.Api.SerialiseJSON
+                        Bcc.Api.SerialiseRaw
+                        Bcc.Api.SerialiseTextEnvelope
+                        Bcc.Api.SerialiseUsing
+                        Bcc.Api.Sophie.Genesis
+                        Bcc.Api.SpecialCole
+                        Bcc.Api.StakePoolMetadata
+                        Bcc.Api.Tx
+                        Bcc.Api.TxBody
+                        Bcc.Api.TxInMode
+                        Bcc.Api.TxMetadata
+                        Bcc.Api.TxSubmit.ErrorRender
+                        Bcc.Api.TxSubmit.Types
+                        Bcc.Api.Utils
+                        Bcc.Api.Value
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , aeson-pretty      >= 0.8.5
+                      , attoparsec
+                      , array
+                      , base16-bytestring >= 1.0
+                      , base58-bytestring
+                      , bech32 >= 1.1.0
+                      , bytestring
+                      , bcc-binary
+                      , bcc-crypto
+                      , bcc-crypto-class
+                      , bcc-crypto-wrapper
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole
+                      , bcc-ledger-core
+                      , bcc-ledger-sophie-ma
+                      , bcc-prelude
+                      , bcc-protocol-toptimum
+                      , bcc-slotting
+                      , cborg
+                      , contra-tracer
+                      , containers
+                      , cryptonite
+                      , deepseq
+                      , directory
+                      , filepath
+                      , formatting
+                      , iproute
+                      , memory
+                      , network
+                      , nothunks
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-cole
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-consensus-sophie
+                      , shardagnostic-network
+                      , shardagnostic-network-framework
+                      , zerepoch-ledger-api
+                      , prettyprinter
+                      , scientific
+                      , sophie-spec-ledger
+                      , small-steps
+                      , stm
+                      , strict-containers
+                      , text
+                      , time
+                      , transformers
+                      , transformers-except
+                      , typed-protocols
+                      , unordered-containers >= 0.2.11
+                      , vector
+                      , yaml
+
+library gen
+  import:               base, project-config
+
+  visibility:           public
+
+  hs-source-dirs:       gen
+
+  exposed-modules:      Gen.Bcc.Api
+                        Gen.Bcc.Api.Metadata
+                        Gen.Bcc.Api.Typed
+                        Gen.Bcc.Crypto.Seed
+                        Gen.Hedgehog.Roundtrip.Bech32
+                        Gen.Hedgehog.Roundtrip.CBOR
+                        Gen.Tasty.Hedgehog.Group
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , base16-bytestring
+                      , bytestring
+                      , bcc-api
+                      , bcc-binary
+                      , bcc-crypto-class
+                      , bcc-crypto-test
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole-test
+                      , bcc-ledger-core
+                      , bcc-prelude
+                      , containers
+                      , hedgehog
+                      , zerepoch-ledger-api
+                      , sophie-spec-ledger
+                      , tasty
+                      , tasty-hedgehog
+                      , text
+
+test-suite bcc-api-test
+  import:               base, project-config
+  hs-source-dirs:       test
+  main-is:              bcc-api-test.hs
+  type:                 exitcode-stdio-1.0
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , bytestring
+                      , bcc-api
+                      , bcc-api:gen
+                      , bcc-binary
+                      , bcc-crypto
+                      , bcc-crypto-class
+                      , bcc-crypto-test
+                      , bcc-crypto-tests
+                      , bcc-ledger-core
+                      , bcc-prelude
+                      , bcc-slotting
+                      , containers
+                      , hedgehog
+                      , hedgehog-extras
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-sophie
+                      , QuickCheck
+                      , sophie-spec-ledger
+                      , sophie-spec-ledger-test
+                      , tasty
+                      , tasty-quickcheck
+                      , time
+
+  other-modules:        Test.Bcc.Api.Crypto
+                        Test.Bcc.Api.Genesis
+                        Test.Bcc.Api.Json
+                        Test.Bcc.Api.KeysCole
+                        Test.Bcc.Api.Ledger
+                        Test.Bcc.Api.Metadata
+                        Test.Bcc.Api.Typed.Bech32
+                        Test.Bcc.Api.Typed.CBOR
+                        Test.Bcc.Api.Typed.Envelope
+                        Test.Bcc.Api.Typed.JSON
+                        Test.Bcc.Api.Typed.Ord
+                        Test.Bcc.Api.Typed.Orphans
+                        Test.Bcc.Api.Typed.RawBytes
+                        Test.Bcc.Api.Typed.Script
+                        Test.Bcc.Api.Typed.Value
+
+  ghc-options:          -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T

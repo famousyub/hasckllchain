@@ -1,0 +1,9 @@
+{
+  "Producers": [
+    {
+      "addr": "relays-new.sophie-qa.dev.bcc.org",
+      "port": 3001,
+      "valency": 2
+    }
+  ]
+}

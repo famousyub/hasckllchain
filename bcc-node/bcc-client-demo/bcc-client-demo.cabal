@@ -1,0 +1,85 @@
+cabal-version: 3.0
+
+name:                bcc-client-demo
+version:             0.1.0.0
+synopsis:            A simple demo bcc-node client application
+description:         This is intended to demonstrate how to write simple
+                     applications that interact with the bcc-node,
+                     using the bcc-api.
+license:             Apache-2.0
+license-file:        LICENSE
+author:              TBCO
+maintainer:          operations@blockchain-company.io
+license-files:
+  LICENSE
+  NOTICE
+extra-source-files:  CHANGELOG.md
+
+common base                         { build-depends: base                             >= 4.14       && < 4.15   }
+
+common project-config
+  default-language:     Haskell2010
+
+executable scan-blocks
+  import:               base, project-config
+  main-is:              ScanBlocks.hs
+  build-depends:        bcc-api
+                      , filepath
+                      , time
+
+executable scan-blocks-pipelined
+  import:               base, project-config
+  main-is:              ScanBlocksPipelined.hs
+  build-depends:        bcc-api
+                      , bcc-ledger-cole
+                      , bcc-slotting
+                      , filepath
+                      , time
+
+executable chain-sync-client-with-ledger-state
+  import:               base, project-config
+  main-is:              ChainSyncClientWithLedgerState.hs
+  build-depends:        bcc-api
+                      , bcc-ledger-cole
+                      , bcc-slotting
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-bcc
+
+                      , filepath
+                      , sop-core
+                      , text
+                      , time
+                      , transformers
+
+executable ledger-state
+  import:              base, project-config
+  main-is:             LedgerState.hs
+  build-depends:       aeson,
+                       base16-bytestring,
+                       bytestring,
+                       containers,
+                       filepath,
+                       memory,
+                       mtl,
+                       text,
+                       time,
+                       transformers,
+                       transformers-except,
+                       yaml,
+
+                       cryptonite,
+                       bcc-api,
+                       bcc-binary,
+                       bcc-crypto-class,
+                       bcc-crypto-wrapper,
+                       bcc-ledger-cole,
+                       bcc-node,
+                       bcc-slotting,
+                       tbco-monitoring,
+                       shardagnostic-network,
+                       shardagnostic-consensus,
+                       shardagnostic-consensus-bcc,
+                       shardagnostic-consensus-cole,
+                       shardagnostic-consensus-sophie,
+                       sophie-spec-ledger,
+                       typed-protocols,

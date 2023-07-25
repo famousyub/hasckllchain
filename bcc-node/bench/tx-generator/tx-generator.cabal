@@ -1,0 +1,154 @@
+name:                  tx-generator
+version:               1.29
+description:           The transaction generator for bcc node
+author:                TBCO
+maintainer:            operations@blockchain-company.io
+license:               Apache-2.0
+license-files:
+  LICENSE
+  NOTICE
+build-type:            Simple
+cabal-version:         >= 1.10
+extra-source-files:    README.md
+library
+
+  hs-source-dirs:      src
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wno-prepositive-qualified-module
+                        -Wno-unticked-promoted-constructors
+                        -Wpartial-fields
+                        -Wredundant-constraints
+                        -Wwarn=deprecations
+
+  exposed-modules:
+                       Bcc.Benchmarking.CliArgsScript
+                       Bcc.Benchmarking.Command
+                       Bcc.Benchmarking.DSL
+                       Bcc.Benchmarking.FundSet
+                       Bcc.Benchmarking.GeneratorTx
+                       Bcc.Benchmarking.GeneratorTx.Benchmark
+                       Bcc.Benchmarking.GeneratorTx.Error
+                       Bcc.Benchmarking.GeneratorTx.LocalProtocolDefinition
+                       Bcc.Benchmarking.GeneratorTx.Genesis
+                       Bcc.Benchmarking.GeneratorTx.NodeToNode
+                       Bcc.Benchmarking.GeneratorTx.Tx
+                       Bcc.Benchmarking.GeneratorTx.SizedMetadata
+                       Bcc.Benchmarking.GeneratorTx.Tx.Cole
+                       Bcc.Benchmarking.GeneratorTx.Submission
+                       Bcc.Benchmarking.GeneratorTx.SubmissionClient
+                       Bcc.Benchmarking.GeneratorTx.CLI.Parsers
+                       Bcc.Benchmarking.ShardagnosticImports
+                       Bcc.Benchmarking.Script
+                       Bcc.Benchmarking.Script.Action
+                       Bcc.Benchmarking.Script.Aeson
+                       Bcc.Benchmarking.Script.Core
+                       Bcc.Benchmarking.Script.Env
+                       Bcc.Benchmarking.Script.Example
+                       Bcc.Benchmarking.Script.Setters
+                       Bcc.Benchmarking.Script.Store
+                       Bcc.Benchmarking.Tracer
+                       Bcc.Benchmarking.Types
+                       Bcc.Benchmarking.Wallet
+                       Bcc.Benchmarking.ZerepochExample
+
+  other-modules:       Paths_tx_generator
+
+  build-depends:       aeson
+                     , aeson-pretty
+                     , async
+                     , attoparsec
+                     , base >=4.12 && <5
+                     , bytestring
+                     , bcc-api
+                     , bcc-binary
+                     , bcc-cli
+                     , bcc-crypto-class
+                     , bcc-crypto-wrapper
+                     , bcc-ledger-cole
+                     , bcc-node
+                     , bcc-prelude
+                     , contra-tracer
+                     , cborg >= 0.2.2 && < 0.3
+                     , containers
+                     , constraints-extras
+                     , dependent-map
+                     , dependent-sum
+                     , dependent-sum-template
+                     , extra
+                     , formatting
+                     , generic-monoid
+                     , ghc-prim
+                     , io-classes
+                     , tbco-monitoring
+                     , ixset-typed
+                     , network
+                     , network-mux
+                     , optparse-applicative-fork
+                     , shardagnostic-consensus
+                     , shardagnostic-consensus-cole
+                     , shardagnostic-consensus-bcc
+                     , shardagnostic-consensus-sophie
+                     , shardagnostic-network
+                     , shardagnostic-network-framework
+                     , random
+                     , serialise
+                     , sophie-spec-ledger
+                     , stm
+                     , text
+                     , time
+                     , transformers
+                     , transformers-except
+                     , unordered-containers
+
+  default-language:    Haskell2010
+  default-extensions:  NoImplicitPrelude
+                       OverloadedStrings
+
+  ghc-options:         -Wall
+                       -Wno-implicit-prelude
+                       -fno-warn-safe
+                       -fno-warn-unsafe
+                       -fno-warn-missing-import-lists
+                       -Wno-unticked-promoted-constructors
+                       -Wincomplete-record-updates
+                       -Wincomplete-uni-patterns
+                       -Wredundant-constraints
+                       -Wpartial-fields
+                       -Wcompat
+
+executable tx-generator
+  hs-source-dirs:      app
+  main-is:             tx-generator.hs
+  default-language:    Haskell2010
+  ghc-options:         -threaded
+                       -Wall
+                       -rtsopts
+                       "-with-rtsopts=-T"
+
+  build-depends:       base >=4.12 && <5
+                     , tx-generator
+
+test-suite tx-generator-test
+  hs-source-dirs:       test
+  main-is:              Main.hs
+  type:                 exitcode-stdio-1.0
+
+  build-depends:        base >=4.12 && <5
+                      , hedgehog
+                      , heredoc
+                      , optparse-applicative-fork
+                      , tasty
+                      , tasty-hedgehog
+                      , tasty-hunit
+                      , tx-generator
+
+  default-language:     Haskell2010
+
+  ghc-options:          -Weverything
+                        -fno-warn-missing-import-lists
+                        -fno-warn-safe
+                        -fno-warn-unsafe
+                        -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T

@@ -1,0 +1,15 @@
+*.o
+*.hi
+*.tix
+*.mix
+.stack-work
+gen/Gen
+gen/Crypto/*
+dist
+QA
+benchs/Bench
+benchs/Hash
+*.sublime-workspace
+.cabal-sandbox/
+cabal.sandbox.config
+stack.yaml.lock

@@ -1,0 +1,196 @@
+#!/bin/env bash
+
+# https://vaneyckt.io/posts/safer_bash_scripts_with_set_euxo_pipefail
+set -eo pipefail
+
+echo "Running the bcc node ..."
+
+# Define a few defaults
+BCC_CONFIG_BASE="/opt/bcc/config"
+
+if [[ -z $BCC_CONFIG ]]; then
+  BCC_CONFIG="$BCC_CONFIG_BASE/mainnet-config.json"
+fi
+
+if [[ -z $BCC_TOPOLOGY ]]; then
+  BCC_TOPOLOGY="$BCC_CONFIG_BASE/mainnet-topology.json"
+fi
+
+if [[ -z $BCC_DATABASE_PATH ]]; then
+  BCC_DATABASE_PATH="/opt/bcc/data"
+fi
+
+if [[ -z $BCC_SOCKET_PATH ]]; then
+  BCC_SOCKET_PATH="/opt/bcc/ipc/socket"
+fi
+
+if [[ -z $BCC_LOG_DIR ]]; then
+  BCC_LOG_DIR="/opt/bcc/logs"
+fi
+
+if [[ -z $BCC_BIND_ADDR ]]; then
+  BCC_BIND_ADDR="0.0.0.0"
+fi
+
+if [[ -z $BCC_PORT ]]; then
+  BCC_PORT=3001
+fi
+
+if [[ -z $BCC_BLOCK_PRODUCER ]]; then
+  BCC_BLOCK_PRODUCER=false
+fi
+
+#####################################################################
+#
+# Print run environment
+#
+printRunEnv () {
+
+  echo "BCC_BIND_ADDR=$BCC_BIND_ADDR"
+  echo "BCC_BLOCK_PRODUCER=$BCC_BLOCK_PRODUCER"
+  echo "BCC_CONFIG=$BCC_CONFIG"
+  echo "BCC_DATABASE_PATH=$BCC_DATABASE_PATH"
+  echo "BCC_LOG_DIR=$BCC_LOG_DIR"
+  echo "BCC_PORT=$BCC_PORT"
+  echo "BCC_SOCKET_PATH=$BCC_SOCKET_PATH"
+  echo "BCC_TOPOLOGY=$BCC_TOPOLOGY"
+
+  if [[ ${BCC_BLOCK_PRODUCER} == true ]]; then
+
+    if [[ -z ${BCC_SOPHIE_KES_KEY} ]]; then
+      BCC_SOPHIE_KES_KEY="$BCC_CONFIG_BASE/keys/kes.skey"
+    fi
+
+    if [[ -z ${BCC_SOPHIE_VRF_KEY} ]]; then
+      BCC_SOPHIE_VRF_KEY="$BCC_CONFIG_BASE/keys/vrf.skey"
+    fi
+
+    if [[ -z ${BCC_SOPHIE_OPERATIONAL_CERTIFICATE} ]]; then
+      BCC_SOPHIE_OPERATIONAL_CERTIFICATE="$BCC_CONFIG_BASE/keys/node.cert"
+    fi
+
+    echo "BCC_SOPHIE_KES_KEY=$BCC_SOPHIE_KES_KEY"
+    echo "BCC_SOPHIE_VRF_KEY=$BCC_SOPHIE_VRF_KEY"
+    echo "BCC_SOPHIE_OPERATIONAL_CERTIFICATE=$BCC_SOPHIE_OPERATIONAL_CERTIFICATE"
+  fi
+}
+
+#####################################################################
+#
+# Write root env file
+#
+writeRootEnv () {
+
+cat << EOF > /usr/local/bin/env
+#!/usr/bin/env bash
+
+# Docker run ENV vars
+BCC_CONFIG="$BCC_CONFIG"
+BCC_TOPOLOGY="$BCC_TOPOLOGY"
+BCC_BIND_ADDR="$BCC_BIND_ADDR"
+BCC_PORT=$BCC_PORT
+BCC_DATABASE_PATH="$BCC_DATABASE_PATH"
+BCC_SOCKET_PATH="$BCC_SOCKET_PATH"
+BCC_LOG_DIR="$BCC_LOG_DIR"
+
+BCC_PUBLIC_IP="$BCC_PUBLIC_IP"
+BCC_CUSTOM_PEERS="$BCC_CUSTOM_PEERS"
+
+BCC_BLOCK_PRODUCER=$BCC_BLOCK_PRODUCER
+
+# Mapping for topologyUpdater
+CNODE_HOSTNAME="$BCC_PUBLIC_IP"
+CNODE_PORT=$BCC_PORT
+CUSTOM_PEERS="$BCC_CUSTOM_PEERS"
+GENESIS_JSON="$BCC_CONFIG_BASE/mainnet-sophie-genesis.json"
+TOPOLOGY="$BCC_TOPOLOGY"
+LOG_DIR="$BCC_LOG_DIR"
+EOF
+}
+
+#####################################################################
+#
+# Run the relay node in the background
+#
+runRelayNode () {
+
+  effopts=(--config $BCC_CONFIG \
+    --topology $BCC_TOPOLOGY \
+    --database-path $BCC_DATABASE_PATH \
+    --socket-path $BCC_SOCKET_PATH \
+    --host-addr $BCC_BIND_ADDR \
+    --port $BCC_PORT)
+
+  effopts+=(${options[@]})
+
+  echo "bcc-node run ${effopts[@]}"
+  exec /usr/local/bin/bcc-node run ${effopts[@]}
+}
+
+#####################################################################
+#
+# Run the block producer in the background
+#
+runBlockProducerNode () {
+
+  effopts=(--config $BCC_CONFIG \
+    --topology $BCC_TOPOLOGY \
+    --database-path $BCC_DATABASE_PATH \
+    --socket-path $BCC_SOCKET_PATH \
+    --host-addr $BCC_BIND_ADDR \
+    --port $BCC_PORT \
+    --sophie-kes-key $BCC_SOPHIE_KES_KEY \
+    --sophie-vrf-key $BCC_SOPHIE_VRF_KEY \
+    --sophie-operational-certificate $BCC_SOPHIE_OPERATIONAL_CERTIFICATE)
+
+  effopts+=(${options[@]})
+
+  echo "bcc-node run ${effopts[@]}"
+  exec /usr/local/bin/bcc-node run ${effopts[@]}
+}
+
+# Shift the first option by one index
+shift
+
+# Override default values with explicit options
+
+options=($@)
+
+for i in "${!options[@]}"
+do
+    j=$((i + 1))
+    key=${options[i]}
+    val=${options[j]}
+    found=false
+
+    # echo "$i/$j: ${key} ${val}"
+
+    case ${key} in
+      --config) BCC_CONFIG=${val}; found=true;;
+      --topology) BCC_TOPOLOGY=${val}; found=true;;
+      --database-path) BCC_DATABASE_PATH=${val}; found=true;;
+      --socket-path) BCC_SOCKET_PATH=${val}; found=true;;
+      --host-addr) BCC_BIND_ADDR=${val}; found=true;;
+      --port) BCC_PORT=${val}; found=true;;
+      --sophie-kes-key) BCC_SOPHIE_KES_KEY=${val}; found=true;;
+      --sophie-vrf-key) BCC_SOPHIE_VRF_KEY=${val}; found=true;;
+      --sophie-operational-certificate) BCC_SOPHIE_OPERATIONAL_CERTIFICATE=${val}; found=true;;
+    esac
+
+    if [[ $found == true ]]; then
+      options[i]="";
+      options[j]="";
+    fi
+done
+
+printRunEnv
+writeRootEnv
+
+# The IPC socket dir is not created on demand
+mkdir -p `dirname ${BCC_SOCKET_PATH}`
+
+if [[ ${BCC_BLOCK_PRODUCER} == true ]]; then
+  runBlockProducerNode
+else
+  runRelayNode
+fi

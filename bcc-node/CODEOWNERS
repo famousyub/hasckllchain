@@ -1,0 +1,38 @@
+# Technical writers
+doc                                                           @rmourey26 
+README.*                                                      @rmourey26 
+bcc-cli/README.md                                             @rmourey26 
+# Release manager added for notification on dependency updates
+cabal.project                                                 @rmourey26
+
+# General reviewers per PR
+#                       TBD
+
+# Specific reviewers for code pieces
+# NB - The last matching pattern takes precedence
+
+
+
+# /doc folder and README.* needs to be owned by @docs-access
+doc                                                           @docs-access
+README.*                                                      @docs-access
+
+bench/tx-generator                                            @rmourey26
+bench                                                         @rmourey26
+nix/workbench                                                 @rmourey26
+nix/supervisord-cluster                                       @rmourey26
+trace-forward                                                 @rmourey26
+Makefile                                                      @rmourey26
+
+.buildkite                                                    @rmourey26
+.github                                                       @rmourey26
+ci                                                            @rmourey26
+configuration                                                 @rmourey26
+nix                                                           @rmourey26
+*.nix                                                         
+flake.lock                                                    @rmourey26
+bors.toml                                                     @rmourey26
+bcc-node/src/Bcc/Tracing/OrphanInstances/Network.hs   @rmourey26
+bcc-node/src/Bcc/Node/Configuration/Logging.hs        @rmourey26
+bcc-node/src/Bcc/Node/Configuration/Socket.hs         @rmourey26
+bcc-node/src/Bcc/Node/Run.hs                          @rmourey26

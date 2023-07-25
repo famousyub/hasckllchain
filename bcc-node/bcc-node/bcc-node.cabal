@@ -1,0 +1,199 @@
+cabal-version: 3.0
+
+name:                   bcc-node
+version:                1.99.0
+description:            The bcc full node
+author:                 TBCO
+maintainer:             operations@tbco.org
+license:                Apache-2.0
+license-files:          LICENSE
+                        NOTICE
+build-type:             Simple
+extra-source-files:     ChangeLog.md
+
+Flag unexpected_thunks
+  Description:    Turn on unexpected thunks checks
+  Default:        False
+
+flag systemd
+  description:    Enable systemd support
+  default:        True
+  manual:         False
+
+common base                         { build-depends: base                             >= 4.14       && < 4.15   }
+
+common project-config
+  default-language:     Haskell2010
+
+  default-extensions:   NoImplicitPrelude
+                        OverloadedStrings
+
+  ghc-options:          -Wall
+                        -Wcompat
+                        -Wincomplete-record-updates
+                        -Wincomplete-uni-patterns
+                        -Wno-unticked-promoted-constructors
+                        -Wpartial-fields
+                        -Wredundant-constraints
+                        -Wunused-packages
+
+common maybe-Win32
+  if os(windows)
+    build-depends:      Win32
+
+common maybe-unix
+  if !os(windows)
+    build-depends:      unix
+
+library
+  import:               base, project-config
+                      , maybe-unix
+                      , maybe-Win32
+  if flag(unexpected_thunks)
+    cpp-options: -DUNEXPECTED_THUNKS
+
+  if os(linux) && flag(systemd)
+    cpp-options: -DSYSTEMD
+    build-depends:     lobemo-scribe-systemd
+                     , systemd
+
+  hs-source-dirs:      src
+
+  exposed-modules:     Bcc.Node.Configuration.Logging
+                       Bcc.Node.Configuration.POM
+                       Bcc.Node.Configuration.Topology
+                       Bcc.Node.Handlers.Shutdown
+                       Bcc.Node.Handlers.TopLevel
+                       Bcc.Node.Orphans
+                       Bcc.Node.Protocol
+                       Bcc.Node.Protocol.Aurum
+                       Bcc.Node.Protocol.Cole
+                       Bcc.Node.Protocol.Bcc
+                       Bcc.Node.Protocol.Sophie
+                       Bcc.Node.Protocol.Types
+                       Bcc.Node.Parsers
+                       Bcc.Node.Run
+                       Bcc.Node.STM
+                       Bcc.Node.Types
+                       Bcc.Tracing.Config
+                       Bcc.Tracing.Constraints
+                       Bcc.Tracing.ConvertTxId
+                       Bcc.Tracing.Kernel
+                       Bcc.Tracing.Metrics
+                       Bcc.Tracing.Peer
+                       Bcc.Tracing.Queries
+                       Bcc.Tracing.Render
+                       Bcc.Tracing.Tracers
+                       Bcc.Tracing.OrphanInstances.Cole
+                       Bcc.Tracing.OrphanInstances.Common
+                       Bcc.Tracing.OrphanInstances.Consensus
+                       Bcc.Tracing.OrphanInstances.HardFork
+                       Bcc.Tracing.OrphanInstances.Network
+                       Bcc.Tracing.OrphanInstances.Sophie
+
+  other-modules:       Paths_bcc_node
+                       Bcc.Node.Configuration.Socket
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , async
+                      , base16-bytestring
+                      , bytestring
+                      , deepseq
+                      , bcc-api
+                      , bcc-config
+                      , bcc-crypto-class
+                      , bcc-crypto-wrapper
+                      , bcc-ledger-aurum
+                      , bcc-ledger-cole
+                      , bcc-ledger-core
+                      , bcc-ledger-sophie-ma
+                      , bcc-prelude
+                      , bcc-protocol-toptimum
+                      , bcc-slotting
+                      , contra-tracer
+                      , cborg >= 0.2.4 && < 0.3
+                      , containers
+                      , directory
+                      , dns
+                      , ekg
+                      , ekg-core
+                      , filepath
+                      , generic-data
+                      , hostname
+                      , iproute
+                      , io-classes
+                      , tbco-monitoring
+                      , lobemo-backend-aggregation
+                      , lobemo-backend-ekg
+                      , lobemo-backend-monitoring
+                      , lobemo-backend-trace-forwarder
+                      , network
+                      , network-mux
+                      , nothunks
+                      , optparse-applicative-fork
+                      , shardagnostic-consensus
+                      , shardagnostic-consensus-cole
+                      , shardagnostic-consensus-bcc
+                      , shardagnostic-consensus-sophie
+                      , shardagnostic-network
+                      , shardagnostic-network-framework
+                      , process
+                      , safe-exceptions
+                      , scientific
+                      , sophie-spec-ledger
+                      , small-steps
+                      , stm
+                      , text
+                      , time
+                      , tracer-transformers
+                      , transformers
+                      , transformers-except
+                      , unordered-containers
+                      , yaml
+
+executable bcc-node
+  import:               base, project-config
+  hs-source-dirs:       app
+  main-is:              bcc-node.hs
+  ghc-options:          -threaded
+                        -rtsopts
+
+  if arch(arm)
+    ghc-options:        "-with-rtsopts=-T -I0 -A16m -N1 --disable-delayed-os-memory-return"
+  else
+    ghc-options:        "-with-rtsopts=-T -I0 -A16m -N2 --disable-delayed-os-memory-return"
+
+  other-modules:        Paths_bcc_node
+
+  build-depends:        bcc-config
+                      , bcc-node
+                      , bcc-prelude
+                      , optparse-applicative-fork
+                      , text
+
+test-suite bcc-node-test
+  import:               base, project-config
+                      , maybe-unix
+  hs-source-dirs:       test
+  main-is:              bcc-node-test.hs
+  type:                 exitcode-stdio-1.0
+
+  build-depends:        aeson             >= 1.5.6.0
+                      , bcc-api
+                      , bcc-node
+                      , bcc-prelude
+                      , bcc-slotting
+                      , directory
+                      , hedgehog
+                      , hedgehog-corpus
+                      , iproute
+                      , shardagnostic-consensus
+                      , shardagnostic-network
+                      , time
+
+  other-modules:        Test.Bcc.Node.FilePermissions
+                        Test.Bcc.Node.Gen
+                        Test.Bcc.Node.Json
+                        Test.Bcc.Node.POM
+
+  ghc-options:          -threaded -rtsopts -with-rtsopts=-N -with-rtsopts=-T
